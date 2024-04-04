@@ -42,13 +42,14 @@
  *  @{
  */
 
-#ifndef _IARM_IRMGR_PLATFORM_
-#define _IARM_IRMGR_PLATFORM_
+
+#ifndef _MOD_IRHAL_PLATFORM_
+#define _MOD_IRHAL_PLATFORM_
 #ifdef __cplusplus 
 extern "C" {
 #endif
 
- /**
+/**
  * @file plat_ir.h
  * 
  * @brief IR HAL header
@@ -74,22 +75,21 @@ extern "C" {
  *
  */
 
-
 /**
  * @brief xmp tag type. This is used to specify the different remote types
  */
 typedef enum PLAT_xmp_tag {
    XMP_TAG_COMCAST = 0x00,   ///< comcast remote 
    XMP_TAG_PLATCO  = 0x01,   ///< platco remote
-   XMP_TAG_XR11V2  = 0x02,   ///< XR11V2 remote   
+   XMP_TAG_XR11V2  = 0x02,   ///< XR11V2 remote
    XMP_TAG_XR15V1  = 0x03,   ///< XR15V1 remote
    XMP_TAG_XR15V2  = 0x04,   ///< XR15V2 remote
    XMP_TAG_XR16V1  = 0x05,   ///< XR16V1 remote
    XMP_TAG_XRAV1   = 0x06,   ///< XRAV1 remote
    XMP_TAG_XR20V1  = 0x07,   ///< XR20V1 remote
-   XMP_TAG_PLATCOV2 = 0x08,
+   XMP_TAG_PLATCOV2  = 0x08, ///< PLATCOV2 remote
    XMP_TAG_UNDEFINED,        ///< Undefined 
-   
+   XMP_TAG_MAX               ///< Out of range - required to be the last item of the enum
 } PLAT_xmp_tag_t;
 
 /**
@@ -97,9 +97,10 @@ typedef enum PLAT_xmp_tag {
  * 
  */
 typedef enum PLAT_xmp_owner {
-   XMP_OWNER_NORMAL  = 0x00,   ///< normal mode
+   XMP_OWNER_NORMAL  = 0x00,   ///< normal mode 
    XMP_OWNER_PAIRING = 0x01,   ///< paring mode
    XMP_OWNER_UNDEFINED,        ///< undefined mode
+   XMP_OWNER_MAX               ///< Out of range - required to be the last item of the enum
 } PLAT_xmp_owner_t;
 
 /**
@@ -107,7 +108,8 @@ typedef enum PLAT_xmp_owner {
  * 
  */
 typedef struct PLAT_irKey_metadata {
-   int              type;  ///< Event type of key press 
+   int              type;  ///< Event type of key press
+   ///< Platform specific. See macros KET_KEYDOWN,  KET_KEYUP, KET_KEYREPEAT etc 
    int              code;  ///< Code of the pressed key
    ///< See macros KED_POWER,  KED_SELECT, KED_CHANNELUP etc 
    PLAT_xmp_tag_t   tag;   ///< Designates which device key belongs. See PLAT_xmp_tag_t
@@ -135,9 +137,12 @@ typedef void (*PLAT_IrKeyCallback_Extended_t)(PLAT_irKey_metadata_t *irKey);
  *
  * @param[in] func callback function. See PLAT_IrKeyCallback_Extended_t
  * 
+ * 
  * @pre  PLAT_API_INIT() should be called before calling this API
  * @warning  This API is NOT thread safe. Caller shall handle the concurrency.
  * @see PLAT_API_INIT()
+ * 
+ * 
  * 
  */
 void PLAT_API_RegisterIRKeyCallbackExtended(PLAT_IrKeyCallback_Extended_t func);
@@ -148,7 +153,8 @@ void PLAT_API_RegisterIRKeyCallbackExtended(PLAT_IrKeyCallback_Extended_t func);
  * The Event Data contains Key Type and Key Code of the IR key pressed
  *
  * @param[in] keyType  Key Type (e.g. Key Down, Key Up, Key Repeat) of the IR key pressed.
-
+ *     Platform specific. See macros KET_KEYDOWN,  KET_KEYUP, KET_KEYREPEAT etc 
+ * 
  * @param[in] keyCode  Key Code of the the IR key. Platform specific. See macros KED_POWER,  KED_SELECT, KED_CHANNELUP etc 
  *
  * @return None
@@ -164,35 +170,36 @@ typedef void (*PLAT_IrKeyCallback_t)(int keyType, int keyCode);
  * The Caller must be notified with the IR Key events using the callback function
  *
  * @param[in] func - callback function ; @see PLAT_IrKeyCallback_t
+ *
  * 
  * @pre  PLAT_API_INIT() should be called before calling this API
  * @warning  This API is NOT thread safe. Caller shall handle the concurrency
  * @see PLAT_API_INIT()
  * 
-*/
+ */
 void PLAT_API_RegisterIRKeyCallback(PLAT_IrKeyCallback_t func);
 
 /**
-* @brief This API initializes the underlying IR module
+ * @brief This API initializes the underlying IR module
  *
  * This function must initialize all the IR specific user input device modules
- * 
- * @return The status of the operation.
- * @retval Returns O if successful, appropriate error code otherwise
  *
+ * 
+ * @return int      - Status
+ * @retval 0        - Success
+ * @retval 1        - Failure
  * @warning  This API is NOT thread safe. Caller shall handle the concurrency
  * @see PLAT_API_TERM()
  * 
- * 
  */
 int  PLAT_API_INIT(void);
-
 /**
  * @brief This API is used to terminate the IR device module
  *
  * This function must terminate all the IR specific user input device modules. It must
  * reset any data structures used within IR module and release any IR specific handles
  * and resources
+ * 
  * 
  * @pre  PLAT_API_INIT() should be called before calling this API
  * @warning  This API is NOT thread safe. Caller shall handle the concurrency
@@ -206,12 +213,14 @@ void PLAT_API_TERM(void);
  * This function executes the platform-specific key event loop. This will generally
  * translate between platform-specific key codes and Comcast standard keycode definitions
  * 
+ * 
  * @pre  PLAT_API_INIT() should be called before calling this API
  * @warning  This API is NOT thread safe. Caller shall handle the concurrency
  * 
  * 
  */
 void PLAT_API_LOOP();
+
 
 #ifdef __cplusplus 
 }
