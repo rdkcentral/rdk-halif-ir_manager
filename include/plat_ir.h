@@ -89,7 +89,6 @@ typedef enum PLAT_xmp_tag {
    XMP_TAG_XR20V1  = 0x07,   ///< XR20V1 remote
    XMP_TAG_PLATCOV2  = 0x08, ///< PLATCOV2 remote
    XMP_TAG_UNDEFINED,        ///< Undefined 
-   XMP_TAG_MAX               ///< Out of range - required to be the last item of the enum
 } PLAT_xmp_tag_t;
 
 /**
@@ -100,7 +99,6 @@ typedef enum PLAT_xmp_owner {
    XMP_OWNER_NORMAL  = 0x00,   ///< normal mode 
    XMP_OWNER_PAIRING = 0x01,   ///< paring mode
    XMP_OWNER_UNDEFINED,        ///< undefined mode
-   XMP_OWNER_MAX               ///< Out of range - required to be the last item of the enum
 } PLAT_xmp_owner_t;
 
 /**
